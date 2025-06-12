@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Test</h1>
+
+    <script>
+        // let socket = new WebSocket("http://127.0.0.1:8000/ws");
+        let socket = new WebSocket("ws://127.0.0.1:8000/ws/data");
+
+        socket.onmessage = function(event) {
+            const date = new Date()
+            console.log(date)
+            console.log("Received data:", JSON.parse(event.data));
+        };
+
+        socket.onopen = function() {
+            console.log("Connected to WebSocket!");
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket disconnected");
+        };
+    </script>
+</body>
+</html>

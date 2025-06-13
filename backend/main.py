@@ -39,6 +39,7 @@ async def lifespan(app: FastAPI):
         periodic_sender_task.cancel()
         await periodic_sender_task
 
+        await websocket_manager.disconnect_all()
         mqtt_subscriber.disconnect()
 
 app = FastAPI(

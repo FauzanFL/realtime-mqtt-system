@@ -53,6 +53,8 @@ class MQTTSubscriber:
             print(f"Subscriber: Error processing data: {e}")
     
     async def connect_mqtt(self):
+        self.set_event_loop(asyncio.get_running_loop())
+
         while True:
             try:
                 print(f"Subscriber: Connecting to MQTT broker...")

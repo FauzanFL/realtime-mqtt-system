@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import asyncio
 import uvicorn
+import json
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
@@ -9,14 +10,36 @@ from mqtt_subscriber import mqtt_subscriber
 
 app = FastAPI()
 
+async def send_data(interval: int = 2):
+    while True:
+        try:
+            combined_data = await mqtt_subscriber.get_combined_data()
+            if combined_data:
+                json_to_send = json.dumps(combined_data)
+                await websocket_manager.broadcast(json_to_send)
+            await asyncio.sleep(interval)
+        except asyncio.CancelledError:
+            print("Send data task cancelled")
+            break
+        except Exception as e:
+            print(f"Error in send_data: {e}")
+            await asyncio.sleep(5)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     asyncio.create_task(mqtt_subscriber.connect_mqtt())
 
-    yield
+    periodic_sender_task = asyncio.create_task(send_data(interval=3))
 
-    print("FastAPI: Shutting down application")
-    mqtt_subscriber.disconnect()
+    try:
+        yield
+    finally:
+        print("FastAPI: Shutting down application")
+
+        periodic_sender_task.cancel()
+        await periodic_sender_task
+
+        mqtt_subscriber.disconnect()
 
 app = FastAPI(
     lifespan=lifespan,
@@ -49,4 +72,4 @@ async def root():
     return {"message": "System is running"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=3000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

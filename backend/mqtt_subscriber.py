@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 import asyncio
 import os
+import time
 from dotenv import load_dotenv
 
 from websocket import websocket_manager
@@ -23,6 +24,8 @@ class MQTTSubscriber:
         self.client.on_connect = self._on_connect
         self._is_connected = asyncio.Event()
         self.loop = None
+        self.lates_data_cache = {topic: {"data": None, "timestamp": 0} for topic in MQTT_TOPICS}
+        self.cache_lock = asyncio.Lock()
     
     def set_event_loop(self, loop):
         self.loop = loop
@@ -48,10 +51,25 @@ class MQTTSubscriber:
     async def _on_message(self, client, userdata, msg):
         try:
             data = msg.payload.decode('utf-8')
-            await websocket_manager.broadcast(data)
+            parsed_data = json.loads(data)
+
+            async with self.cache_lock:
+                self.lates_data_cache[msg.topic] = {
+                    "data": parsed_data,
+                    "timestamp": time.time()
+                }
         except Exception as e:
             print(f"Subscriber: Error processing data: {e}")
     
+    async def get_combined_data(self):
+        combined = {}
+        async with self.cache_lock:
+            for topic, cache_entry in self.lates_data_cache.items():
+                if cache_entry["data"] is not None:
+                    combined[topic] = cache_entry["data"]
+        
+        return combined
+
     async def connect_mqtt(self):
         self.set_event_loop(asyncio.get_running_loop())
 

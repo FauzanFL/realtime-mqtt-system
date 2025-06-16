@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 import asyncio
-import json
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -12,11 +11,9 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_NAME")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-
-from mqtt_subscriber import MQTT_TOPICS
 
 DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -47,6 +44,13 @@ class DatabaseManager:
             print(f"Database: Failed to create tables: {e}")
         finally:
             self._is_ready.set()
+    
+    def _parse_datetime(self, datetime_str):
+        try:
+            return datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            print(f"❌ Error parse datetime: {datetime_str} -> {e}")
+            return None
 
     async def get_db(self):
         await self._is_ready.wait()
@@ -75,18 +79,52 @@ class DatabaseManager:
                         async for session in self.get_db():
                             for topic, payload in combined_data.items():
                                 TopicModel = self.topic_models.get(topic)
-                                if TopicModel:
-                                    data_copy = payload.copy()
+                                
+                                if not TopicModel:
+                                    print(f"Database: No model defined for topic: {topic}")
+                                    continue
 
-                                    new_entry = TopicModel(
-                                        payload= json.dumps(data_copy),
-                                        timestamp= datetime.now()
-                                    )
+                                try:
+                                    if TopicModel == SmartHomeLivingRoomData:
+                                        new_entry = SmartHomeLivingRoomData(
+                                            device_id = payload["device_id"],
+                                            timestamp = self._parse_datetime(payload["timestamp"]),
+                                            temperature_celsius = payload["temperature_celsius"],
+                                            humidity_percent = payload["humidity_percent"],
+                                            light_lux = payload["light_lux"],
+                                            motion_detected = payload["motion_detected"]
+                                        )
+                                    elif TopicModel == FleetTruckLocationData:
+                                        new_entry = FleetTruckLocationData(
+                                            truck_id = payload["truck_id"],
+                                            timestamp = self._parse_datetime(payload["timestamp"]),
+                                            latitude = payload["latitude"],
+                                            longitude = payload["longitude"],
+                                            speed_kph = payload["speed_kph"],
+                                            heading_degrees = payload["heading_degrees"]
+                                        )
+                                    elif TopicModel == FactoryMachineData:
+                                        new_entry = FactoryMachineData(
+                                            machine_id = payload["machine_id"],
+                                            timestamp = self._parse_datetime(payload["timestamp"]),
+                                            status = payload["status"],
+                                            production_count = payload["production_count"],
+                                            error_code = payload["error_code"],
+                                            maintenance_required = payload["maintenance_required"]
+                                        )
+                                    else:
+                                        continue
 
                                     session.add(new_entry)
-                                else:
-                                    print("Database: No model defined")
+                                except KeyError as ke:
+                                    print(f"Database: Error key missing in payload for topic '{topic}': {ke}")
+                                except ValueError as ve:
+                                    print(f"Database: Error converting value in paylaod for topic '{topic}': {ve}")
+                                except Exception as e:
+                                    print(f"Database: Error when processing data for topic '{topic}': {e}")
+                                    
                             await session.commit()
+                            print("Data send to db")
 
                 await asyncio.sleep(self.storage_interval)
             except asyncio.CancelledError:
@@ -95,3 +133,5 @@ class DatabaseManager:
             except Exception as e:
                 print(f"Database: Error in storing data: {e}")
                 await asyncio.sleep(5)
+
+db_manager = DatabaseManager()

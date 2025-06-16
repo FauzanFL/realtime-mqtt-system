@@ -24,7 +24,7 @@ class FleetTruckLocationData(BaseModel):
 class SmartHomeLivingRoomData(BaseModel):
     device_id: str
     timestamp: datetime
-    temperature_celcius: float
+    temperature_celsius: float
     humidity_percent: float
     light_lux: int
     motion_detected: bool
@@ -57,7 +57,7 @@ class SmartHomeLivingRoomData(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     device_id = Column(String(255))
     timestamp = Column(TIMESTAMP)
-    temperature_celcius = Column(Float)
+    temperature_celsius = Column(Float)
     humidity_percent = Column(Float)
     light_lux = Column(Integer)
     motion_detected = Column(Boolean)

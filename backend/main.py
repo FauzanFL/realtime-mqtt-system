@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 from websocket import websocket_manager
 from mqtt_subscriber import mqtt_subscriber
+from database import db_manager
 
 app = FastAPI()
 
@@ -27,9 +28,16 @@ async def send_data(interval: int = 2):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await db_manager.init_db()
+    db_manager.set_mqtt_subscriber(mqtt_subscriber)
+    # db_manager.set_storage_enabled(True)
+    db_manager.set_storage_interval(5)
+
     asyncio.create_task(mqtt_subscriber.connect_mqtt())
 
     periodic_sender_task = asyncio.create_task(send_data(interval=3))
+
+    periodic_store_data_to_db = asyncio.create_task(db_manager.save_data())
 
     try:
         yield
@@ -37,7 +45,10 @@ async def lifespan(app: FastAPI):
         print("FastAPI: Shutting down application")
 
         periodic_sender_task.cancel()
+        periodic_store_data_to_db.cancel()
+
         await periodic_sender_task
+        await periodic_store_data_to_db
 
         await websocket_manager.disconnect_all()
         mqtt_subscriber.disconnect()

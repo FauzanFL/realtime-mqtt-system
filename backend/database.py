@@ -49,7 +49,7 @@ class DatabaseManager:
         try:
             return datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
         except Exception as e:
-            print(f"❌ Error parse datetime: {datetime_str} -> {e}")
+            print(f"Database: Error parse datetime: {datetime_str} -> {e}")
             return None
 
     async def get_db(self):
@@ -114,7 +114,7 @@ class DatabaseManager:
                                         )
                                     else:
                                         continue
-                                    
+
                                     session.add(new_entry)
                                 except KeyError as ke:
                                     print(f"Database: Error key missing in payload for topic '{topic}': {ke}")

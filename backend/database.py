@@ -114,7 +114,7 @@ class DatabaseManager:
                                         )
                                     else:
                                         continue
-
+                                    
                                     session.add(new_entry)
                                 except KeyError as ke:
                                     print(f"Database: Error key missing in payload for topic '{topic}': {ke}")
@@ -124,7 +124,7 @@ class DatabaseManager:
                                     print(f"Database: Error when processing data for topic '{topic}': {e}")
                                     
                             await session.commit()
-                            print("Data send to db")
+                            print("Database: Data sent to db server")
 
                 await asyncio.sleep(self.storage_interval)
             except asyncio.CancelledError:

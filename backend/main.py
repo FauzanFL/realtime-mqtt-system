@@ -30,8 +30,10 @@ async def send_data(interval: int = 2):
 async def lifespan(app: FastAPI):
     await db_manager.init_db()
     db_manager.set_mqtt_subscriber(mqtt_subscriber)
-    # db_manager.set_storage_enabled(True)
-    db_manager.set_storage_interval(5)
+    # Set condition if want to save data to db or no (default true)
+    # db_manager.set_storage_enabled(False)
+    # Set interval for storing data to db (default 10 in second)
+    # db_manager.set_storage_interval(5)
 
     asyncio.create_task(mqtt_subscriber.connect_mqtt())
 

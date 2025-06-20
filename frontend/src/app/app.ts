@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Header } from "./components/header/header";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Header],
   template: `
-    <h1>Welcome to {{title}}!</h1>
-
+    <app-header title={{this.title}}/>
     <router-outlet />
   `,
   styles: [],
 })
 export class App {
-  protected title = 'frontend';
+  protected title = 'Realtime Monitoring System';
 }

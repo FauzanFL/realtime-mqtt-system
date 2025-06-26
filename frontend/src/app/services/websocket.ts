@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, timer } from 'rxjs';
 import { RealtimeMessage } from '../models/data.models';
 import { environment } from '../../environments/environment.development';
@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment.development';
 @Injectable({
   providedIn: 'root'
 })
-export class Websocket {
+export class Websocket implements OnDestroy {
   private websocket!: WebSocket;
 
   private messageSubject: Subject<RealtimeMessage> = new Subject<RealtimeMessage>();
@@ -78,5 +78,18 @@ export class Websocket {
     } else {
       console.error('Websocket: Max attempt reached. Cannot reconnect');
     }
+  }
+
+  closeConnection(): void {
+    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      this.websocket.close(1000, 'Client disconnected');
+      this.connectionStatusSubject.next(false);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.closeConnection();
+    this.messageSubject.complete();
+    this.connectionStatusSubject.complete();
   }
 }

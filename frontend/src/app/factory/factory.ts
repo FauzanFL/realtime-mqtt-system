@@ -23,7 +23,7 @@ export class Factory implements OnInit, OnDestroy {
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
         this.factoryData = messageFiltered['factory/line_A/machine_status'];
-        console.log(this.factoryData);
+        // console.log(this.factoryData);
       }
     })
   }

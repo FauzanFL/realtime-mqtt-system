@@ -1,7 +1,7 @@
 export interface SmartHomeLivingRoomSensorData {
   device_id: string;
   timestamp: string;
-  temperature_celcius: number;
+  temperature_celsius: number;
   humidity_percent: number;
   light_lux: number;
   motion_detected: boolean;

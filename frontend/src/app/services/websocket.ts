@@ -31,7 +31,7 @@ export class Websocket implements OnDestroy {
       return;
     }
 
-    console.log(`Websocket: Connecting to ${this.WEBSOCKET_URL}...`);
+    console.log('Websocket: Connecting...');
     this.websocket = new WebSocket(this.WEBSOCKET_URL);
 
     this.websocket.onopen = (event) => {

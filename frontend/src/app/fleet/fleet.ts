@@ -23,7 +23,7 @@ export class Fleet implements OnInit, OnDestroy {
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
         this.fleetData = messageFiltered['fleet/truck_101/location'];
-        console.log(this.fleetData);
+        // console.log(this.fleetData);
       }
     })
   }

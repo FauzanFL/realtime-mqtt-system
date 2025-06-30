@@ -24,7 +24,7 @@ AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_com
 class DatabaseManager:
     def __init__(self):
         self._is_ready = asyncio.Event()
-        self.storage_enabled = True
+        self.storage_enabled = False
         self.storage_interval = 10
         self.mqtt_subscriber = None
 

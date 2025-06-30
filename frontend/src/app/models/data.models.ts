@@ -21,7 +21,6 @@ export interface FactoryLineAMachineStatusData {
   timestamp: string;
   status: string;
   pressure_psi: number;
-  temperature_c: number;
   error_code: string | null;
   production_count: number;
   maintenance_required: boolean;

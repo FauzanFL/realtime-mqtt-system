@@ -15,19 +15,19 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         <a
           routerLink="/smarthome"
           routerLinkActive="font-bold text-yellow-300 bg-indigo-600"
-          class="text-white hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-lg font-semibold">
+          class="text-white hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-xl font-semibold">
           Smart Home
         </a>
         <a
           routerLink="/fleet"
           routerLinkActive="font-bold text-yellow-300 bg-indigo-600"
-          class="text-white hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-lg font-semibold">
+          class="text-white hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-xl font-semibold">
           Fleet
         </a>
         <a
           routerLink="/factory"
           routerLinkActive="font-bold text-yellow-300 bg-indigo-600"
-          class="text-white text hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-lg font-semibold">
+          class="text-white text hover:text-yellow-200 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors duration-200 text-xl font-semibold">
           Factory
         </a>
       </nav>

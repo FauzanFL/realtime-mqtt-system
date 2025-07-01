@@ -12,8 +12,8 @@ export interface FleetTruckLocationData {
   timestamp: string;
   latitude: number;
   longitude: number;
-  speed_kmh: number;
-  fuel_percent: number;
+  speed_kph: number;
+  heading_degrees: number;
 }
 
 export interface FactoryLineAMachineStatusData {

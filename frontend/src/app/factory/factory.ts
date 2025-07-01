@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FactoryLineAMachineStatusData } from '../models/data.models';
@@ -16,28 +16,28 @@ import { CommonModule } from '@angular/common';
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Machine ID:</span>
           </div>
-          <span class="font-mono text-sm">{{factoryData.machine_id}}</span>
+          <span class="font-mono text-sm">{{factoryData().machine_id}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Error Code:</span>
           </div>
-          <span class="font-mono" [ngClass]="{'text-red-600': factoryData.error_code}">{{factoryData.error_code ? factoryData.error_code : 'NO ERROR'}}</span>
+          <span class="font-mono" [ngClass]="{'text-red-600': factoryData().error_code}">{{factoryData().error_code ? factoryData().error_code : 'NO ERROR'}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Maintenance Required:</span>
           </div>
-          <span class="font-mono">{{factoryData.maintenance_required ? 'Yes' : 'No'}}</span>
+          <span class="font-mono">{{factoryData().maintenance_required ? 'Yes' : 'No'}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Production Count:</span>
           </div>
-            <span class="font-semibold">{{factoryData.production_count}}</span>
+            <span class="font-semibold">{{factoryData().production_count}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
@@ -45,11 +45,11 @@ import { CommonModule } from '@angular/common';
             <span class="text-gray-700 font-medium">Status:</span>
           </div>
           <span class="font-mono" [ngClass]="{
-            'text-green-600': factoryData.status === 'RUNNING',
-            'text-red-600': factoryData.status === 'ERROR',
-            'text-yellow-600': factoryData.status === 'OFFLINE',
-            'text-gray-600': factoryData.status == 'IDLE'
-          }">{{factoryData.status}}</span>
+            'text-green-600': factoryData().status === 'RUNNING',
+            'text-red-600': factoryData().status === 'ERROR',
+            'text-yellow-600': factoryData().status === 'OFFLINE',
+            'text-gray-600': factoryData().status == 'IDLE'
+          }">{{factoryData().status}}</span>
         </div>
       </div>
     </section>
@@ -57,7 +57,7 @@ import { CommonModule } from '@angular/common';
   styles: ``
 })
 export class Factory implements OnInit, OnDestroy {
-  factoryData: FactoryLineAMachineStatusData = {
+  factoryData = signal<FactoryLineAMachineStatusData>({
     machine_id: "",
     error_code: "",
     maintenance_required: false,
@@ -65,7 +65,7 @@ export class Factory implements OnInit, OnDestroy {
     production_count: 0,
     status: "OFFLINE",
     timestamp: ""
-  };
+  });
   private websocketSub: Subscription | undefined;
 
   constructor(private websockteService: Websocket, private cdr: ChangeDetectorRef){};
@@ -74,11 +74,7 @@ export class Factory implements OnInit, OnDestroy {
     this.websocketSub = this.websockteService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
-        this.factoryData = messageFiltered['factory/line_A/machine_status'];
-        console.log(this.factoryData);
-
-        // menggunakan detectChanges secara manual (--zoneless)
-        this.cdr.detectChanges();
+        this.factoryData.set(messageFiltered['factory/line_A/machine_status']);
       }
     })
   }

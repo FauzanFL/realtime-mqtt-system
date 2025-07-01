@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { SmartHomeLivingRoomSensorData } from '../models/data.models';
@@ -16,40 +16,35 @@ import { CommonModule } from '@angular/common';
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Device ID:</span>
           </div>
-          <span class="font-mono text-sm">{{smartHomeData.device_id}}</span>
+          <span class="font-mono text-sm">{{smartHomeData().device_id}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Humidity:</span>
           </div>
-          <span class="font-mono">{{smartHomeData.humidity_percent}} %</span>
+          <span class="font-mono">{{smartHomeData().humidity_percent}} %</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Light Intensity:</span>
           </div>
-          <span class="font-mono">{{smartHomeData.light_lux}} lux</span>
+          <span class="font-mono">{{smartHomeData().light_lux}} lux</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Motion Detected:</span>
           </div>
-          @if (smartHomeData.motion_detected) {
-            <span class="font-semibold text-green-600">Yes</span>
-          }
-          @else {
-            <span class="font-semibold text-red-600">No</span>
-          }
+          <span class="font-semibold" [ngClass]="smartHomeData().motion_detected ? 'text-green-600' : 'text-red-600'">{{smartHomeData().motion_detected ? 'Yes' : 'No'}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Temperature:</span>
           </div>
-          <span class="font-mono">{{smartHomeData.temperature_celsius}} °C</span>
+          <span class="font-mono">{{smartHomeData().temperature_celsius}} °C</span>
         </div>
       </div>
     </section>
@@ -57,27 +52,24 @@ import { CommonModule } from '@angular/common';
   styles: ``
 })
 export class SmartHome implements OnInit, OnDestroy {
-  smartHomeData: SmartHomeLivingRoomSensorData = {
+  smartHomeData = signal<SmartHomeLivingRoomSensorData>({
     device_id: "",
     humidity_percent: 0.0,
     light_lux: 0.0,
     motion_detected: false,
     temperature_celsius: 0.0,
     timestamp: ""
-  };
+  });
   private websocketSub!: Subscription;
 
-  constructor(private websocketService: Websocket, private cdr: ChangeDetectorRef){};
+  constructor(private websocketService: Websocket){};
 
   ngOnInit(): void {
     this.websocketSub = this.websocketService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
         
-        this.smartHomeData = messageFiltered['smart_home/living_room/sensor'];
-        
-        // menggunakan detectChanges secara manual (--zoneless)
-        this.cdr.detectChanges();
+        this.smartHomeData.set(messageFiltered['smart_home/living_room/sensor']);
       },
       error: (err) => console.error(err),
     })

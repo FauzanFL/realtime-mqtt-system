@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FleetTruckLocationData } from '../models/data.models';
@@ -15,35 +15,35 @@ import { FleetTruckLocationData } from '../models/data.models';
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Truck ID:</span>
           </div>
-          <span class="font-mono text-sm">{{fleetData.truck_id}}</span>
+          <span class="font-mono text-sm">{{fleetData().truck_id}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Heading Degrees:</span>
           </div>
-          <span class="font-mono">{{fleetData.heading_degrees}}</span>
+          <span class="font-mono">{{fleetData().heading_degrees}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Latitude:</span>
           </div>
-          <span class="font-mono">{{fleetData.latitude}}</span>
+          <span class="font-mono">{{fleetData().latitude}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Longitude:</span>
           </div>
-            <span class="font-mono">{{fleetData.longitude}}</span>
+            <span class="font-mono">{{fleetData().longitude}}</span>
         </div>
 
         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
           <div class="flex items-center gap-2">
             <span class="text-gray-700 font-medium">Speed:</span>
           </div>
-          <span class="font-mono">{{fleetData.speed_kph}} Km/H</span>
+          <span class="font-mono">{{fleetData().speed_kph}} Km/H</span>
         </div>
       </div>
     </section>
@@ -51,24 +51,23 @@ import { FleetTruckLocationData } from '../models/data.models';
   styles: ``
 })
 export class Fleet implements OnInit, OnDestroy {
-  fleetData: FleetTruckLocationData = {
+  fleetData = signal<FleetTruckLocationData>({
     truck_id: "",
     heading_degrees: 0,
     latitude: 0,
     longitude: 0,
     speed_kph: 0,
     timestamp: ""
-  };
+  });
   private websocketSub: Subscription | undefined;
 
-  constructor(private websocketService: Websocket, private cdr: ChangeDetectorRef){};
+  constructor(private websocketService: Websocket){};
 
   ngOnInit(): void {
     this.websocketSub = this.websocketService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
-        this.fleetData = messageFiltered['fleet/truck_101/location'];
-        this.cdr.detectChanges();
+        this.fleetData.set(messageFiltered['fleet/truck_101/location']);
       }
     })
   }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FactoryLineAMachineStatusData } from '../models/data.models';
@@ -68,7 +68,7 @@ export class Factory implements OnInit, OnDestroy {
   });
   private websocketSub: Subscription | undefined;
 
-  constructor(private websockteService: Websocket, private cdr: ChangeDetectorRef){};
+  constructor(private websockteService: Websocket){};
 
   ngOnInit(): void {
     this.websocketSub = this.websockteService.messages$.subscribe({

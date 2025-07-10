@@ -3,12 +3,21 @@ import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { SmartHomeLivingRoomSensorData } from '../models/data.models';
 import { CommonModule } from '@angular/common';
+import { HumidityChart } from "../components/charts/humidity-chart/humidity-chart";
+import { SystemItemCard } from "../components/cards/system-item-card/system-item-card";
+import { TemperatureChart } from "../components/charts/temperature-chart/temperature-chart";
 
 @Component({
   selector: 'app-smart-home',
-  imports: [CommonModule],
+  imports: [CommonModule, HumidityChart, SystemItemCard, TemperatureChart],
   template: `
-    <section class="flex justify-center items-center p-8">
+    <section class="flex p-8">
+      <!-- <app-system-item-card title="Humidity">
+        <app-humidity-chart [humidityValue]="smartHomeData().humidity_percent" />
+      </app-system-item-card>
+      <app-system-item-card title="Temperature">
+        <app-temperature-chart [temperatureValue]="smartHomeData().temperature_celsius" [minTemp]="0" [maxTemp]="100" />
+      </app-system-item-card> -->
       <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 space-y-4">
         <h1 class="text-center text-2xl font-bold text-blue-800">Living Room Sensor</h1>
 

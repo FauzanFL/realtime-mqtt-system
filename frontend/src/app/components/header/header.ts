@@ -6,8 +6,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   imports: [RouterLink, RouterLinkActive],
   template: `
     <header class="bg-gradient-to-r from-blue-500 to-indigo-700 text-white shadow-lg py-2 px-4 sm:px-6 md:px-8 flex items-center justify-between">
-      <section class="flex justify-center items-center">
-        <img src="/assets/img/logo.png" alt="" class="w-25 h-25">
+      <section class="flex justify-center items-center gap-2">
+        <img src="/assets/img/logo.png" alt="" class="w-20 h-20 my-2 bg-slate-100 rounded-full">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">{{title()}}</h1>
       </section>
 

@@ -6,56 +6,31 @@ import { CommonModule } from '@angular/common';
 import { HumidityChart } from "../components/charts/humidity-chart/humidity-chart";
 import { SystemItemCard } from "../components/cards/system-item-card/system-item-card";
 import { TemperatureChart } from "../components/charts/temperature-chart/temperature-chart";
+import { LightIntensity } from "../components/elements/light-intensity/light-intensity";
+import { MotionDetected } from "../components/elements/motion-detected/motion-detected";
 
 @Component({
   selector: 'app-smart-home',
-  imports: [CommonModule, HumidityChart, SystemItemCard, TemperatureChart],
+  imports: [CommonModule, HumidityChart, SystemItemCard, TemperatureChart, LightIntensity, MotionDetected],
   template: `
-    <section class="flex p-8">
-      <!-- <app-system-item-card title="Humidity">
-        <app-humidity-chart [humidityValue]="smartHomeData().humidity_percent" />
-      </app-system-item-card>
-      <app-system-item-card title="Temperature">
-        <app-temperature-chart [temperatureValue]="smartHomeData().temperature_celsius" [minTemp]="0" [maxTemp]="100" />
-      </app-system-item-card> -->
-      <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 space-y-4">
-        <h1 class="text-center text-2xl font-bold text-blue-800">Living Room Sensor</h1>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Device ID:</span>
-          </div>
-          <span class="font-mono text-sm">{{smartHomeData().device_id}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Humidity:</span>
-          </div>
-          <span class="font-mono">{{smartHomeData().humidity_percent}} %</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Light Intensity:</span>
-          </div>
-          <span class="font-mono">{{smartHomeData().light_lux}} lux</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Motion Detected:</span>
-          </div>
-          <span class="font-semibold" [ngClass]="smartHomeData().motion_detected ? 'text-green-600' : 'text-red-600'">{{smartHomeData().motion_detected ? 'Yes' : 'No'}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Temperature:</span>
-          </div>
-          <span class="font-mono">{{smartHomeData().temperature_celsius}} °C</span>
-        </div>
-      </div>
+    <section class="flex flex-col justify-between p-8">
+      <section class="px-2 py-4">
+        <h2 class="text-xl font-semibold">Device ID: <span class="font-bold">{{smartHomeData().device_id}}</span></h2>
+      </section>
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <app-system-item-card title="Humidity">
+          <app-humidity-chart [humidityValue]="smartHomeData().humidity_percent" />
+        </app-system-item-card>
+        <app-system-item-card title="Temperature">
+          <app-temperature-chart [temperatureValue]="smartHomeData().temperature_celsius" [minTemp]="0" [maxTemp]="100" />
+        </app-system-item-card>
+        <app-system-item-card title="Light Intensity">
+          <app-light-intensity [luxValue]="smartHomeData().light_lux"/>
+        </app-system-item-card>
+        <app-system-item-card title="Motion">
+          <app-motion-detected [motionDetected]="smartHomeData().motion_detected"/>
+        </app-system-item-card>
+      </section>
     </section>
   `,
   styles: ``

@@ -2,51 +2,19 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FleetTruckLocationData } from '../models/data.models';
+import { RealtimeMapDisplay } from "../components/realtime-map-display/realtime-map-display";
 
 @Component({
   selector: 'app-fleet',
-  imports: [],
+  imports: [RealtimeMapDisplay],
   template: `
-    <section class="flex justify-center items-center p-8">
-      <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 space-y-4">
-        <h1 class="text-center text-2xl font-bold text-blue-800">Fleet Truck Location</h1>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Truck ID:</span>
-          </div>
-          <span class="font-mono text-sm">{{fleetData().truck_id}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Heading Degrees:</span>
-          </div>
-          <span class="font-mono">{{fleetData().heading_degrees}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Latitude:</span>
-          </div>
-          <span class="font-mono">{{fleetData().latitude}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Longitude:</span>
-          </div>
-            <span class="font-mono">{{fleetData().longitude}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Speed:</span>
-          </div>
-          <span class="font-mono">{{fleetData().speed_kph}} Km/H</span>
-        </div>
-      </div>
-    </section>
+    <app-realtime-map-display
+      [lat]="fleetData().latitude"
+      [long]="fleetData().longitude"
+      [heading]="fleetData().heading_degrees"
+      [truckId]="fleetData().truck_id"
+      [speed]="fleetData().speed_kph"
+    />
   `,
   styles: ``
 })

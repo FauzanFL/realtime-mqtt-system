@@ -3,55 +3,43 @@ import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FactoryLineAMachineStatusData } from '../models/data.models';
 import { CommonModule } from '@angular/common';
+import { SystemItemCard } from "../components/cards/system-item-card/system-item-card";
 
 @Component({
   selector: 'app-factory',
-  imports: [CommonModule],
+  imports: [CommonModule, SystemItemCard],
   template: `
-    <section class="flex justify-center items-center p-8">
-      <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 space-y-4">
-        <h1 class="text-center text-2xl font-bold text-blue-800">Factory Machine Status</h1>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Machine ID:</span>
+    <section class="flex flex-col justify-between p-8">
+      <section class="px-2 py-4">
+        <h2 class="text-xl font-semibold">Machine ID: <span class="font-bold">{{factoryData().machine_id}}</span></h2>
+      </section>
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <app-system-item-card title="Production Count">
+          <div class="w-full flex justify-center items-center text-xl font-semibold py-5">
+            <span>{{factoryData().production_count}} unit</span>
           </div>
-          <span class="font-mono text-sm">{{factoryData().machine_id}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Error Code:</span>
+        </app-system-item-card>
+        <app-system-item-card title="Status">
+          <div class="w-full flex justify-center items-center text-xl font-semibold py-5">
+            <span class="font-mono" [ngClass]="{
+              'text-green-600': factoryData().status === 'RUNNING',
+              'text-red-600': factoryData().status === 'ERROR',
+              'text-yellow-600': factoryData().status === 'OFFLINE',
+              'text-gray-600': factoryData().status == 'IDLE'
+            }">{{factoryData().status}}</span>
           </div>
-          <span class="font-mono" [ngClass]="{'text-red-600': factoryData().error_code}">{{factoryData().error_code ? factoryData().error_code : 'NO ERROR'}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Maintenance Required:</span>
+        </app-system-item-card>
+        <app-system-item-card title="Maintenance Required">
+          <div class="w-full flex justify-center items-center text-xl font-semibold py-5">
+            <span class="font-mono" [ngClass]="{'text-red-600': factoryData().maintenance_required}">{{factoryData().maintenance_required ? 'Yes' : 'No'}}</span>
           </div>
-          <span class="font-mono">{{factoryData().maintenance_required ? 'Yes' : 'No'}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Production Count:</span>
+        </app-system-item-card>
+        <app-system-item-card title="Error Code">
+          <div class="w-full flex justify-center items-center text-xl font-semibold py-5">
+            <span class="font-mono" [ngClass]="{'text-red-600': factoryData().error_code}">{{factoryData().error_code ? factoryData().error_code : 'NO ERROR'}}</span>
           </div>
-            <span class="font-semibold">{{factoryData().production_count}}</span>
-        </div>
-
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-700 font-medium">Status:</span>
-          </div>
-          <span class="font-mono" [ngClass]="{
-            'text-green-600': factoryData().status === 'RUNNING',
-            'text-red-600': factoryData().status === 'ERROR',
-            'text-yellow-600': factoryData().status === 'OFFLINE',
-            'text-gray-600': factoryData().status == 'IDLE'
-          }">{{factoryData().status}}</span>
-        </div>
-      </div>
+        </app-system-item-card>
+      </section>
     </section>
   `,
   styles: ``

@@ -73,6 +73,11 @@ app.add_middleware(
 async def ws_endpoint(websocket: WebSocket):
     await websocket_manager.connect(websocket)
     try:
+        combined_data = await mqtt_subscriber.get_combined_data()
+        if combined_data:
+            json_to_send = json.dumps(combined_data)
+            await websocket.send_text(json_to_send)
+
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:

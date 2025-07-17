@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { Websocket } from '../services/websocket';
 import { FleetTruckLocationData } from '../models/data.models';
 import { RealtimeMapDisplay } from "../components/realtime-map-display/realtime-map-display";
+import { Loading } from '../services/loading';
 
 @Component({
   selector: 'app-fleet',
@@ -29,14 +30,18 @@ export class Fleet implements OnInit, OnDestroy {
   });
   private websocketSub: Subscription | undefined;
 
-  constructor(private websocketService: Websocket){};
+  constructor(private websocketService: Websocket, private loadingService: Loading){};
 
   ngOnInit(): void {
+    this.loadingService.show();
     this.websocketSub = this.websocketService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
         this.fleetData.set(messageFiltered['fleet/truck_101/location']);
-      }
+        
+        this.loadingService.hide();
+      },
+      error: (err) => console.error(err),
     })
   }
 

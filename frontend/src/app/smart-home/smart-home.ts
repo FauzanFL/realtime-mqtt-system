@@ -8,6 +8,7 @@ import { SystemItemCard } from "../components/cards/system-item-card/system-item
 import { TemperatureChart } from "../components/charts/temperature-chart/temperature-chart";
 import { LightIntensity } from "../components/elements/light-intensity/light-intensity";
 import { MotionDetected } from "../components/elements/motion-detected/motion-detected";
+import { Loading } from '../services/loading';
 
 @Component({
   selector: 'app-smart-home',
@@ -46,14 +47,16 @@ export class SmartHome implements OnInit, OnDestroy {
   });
   private websocketSub!: Subscription;
 
-  constructor(private websocketService: Websocket){};
+  constructor(private websocketService: Websocket, private loadingService: Loading){};
 
   ngOnInit(): void {
+    this.loadingService.show();
     this.websocketSub = this.websocketService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
-        
         this.smartHomeData.set(messageFiltered['smart_home/living_room/sensor']);
+        
+        this.loadingService.hide();
       },
       error: (err) => console.error(err),
     })

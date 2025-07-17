@@ -4,6 +4,7 @@ import { Websocket } from '../services/websocket';
 import { FactoryLineAMachineStatusData } from '../models/data.models';
 import { CommonModule } from '@angular/common';
 import { SystemItemCard } from "../components/cards/system-item-card/system-item-card";
+import { Loading } from '../services/loading';
 
 @Component({
   selector: 'app-factory',
@@ -56,14 +57,18 @@ export class Factory implements OnInit, OnDestroy {
   });
   private websocketSub: Subscription | undefined;
 
-  constructor(private websockteService: Websocket){};
+  constructor(private websockteService: Websocket, private loadingService: Loading){};
 
   ngOnInit(): void {
+    this.loadingService.show();
     this.websocketSub = this.websockteService.messages$.subscribe({
       next: (message) => {
         const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
         this.factoryData.set(messageFiltered['factory/line_A/machine_status']);
-      }
+        
+        this.loadingService.hide();
+      },
+      error: (err) => console.error(err),
     })
   }
 

@@ -19,7 +19,7 @@ export class Websocket implements OnDestroy {
   private maxReconnectAttempts = 5;
   private reconnectInterval = 5000;
 
-  private readonly WEBSOCKET_URL = environment.websocketUrl
+  private readonly WEBSOCKET_URL = environment.websocketUrl;
 
   constructor() {
     this.connect()

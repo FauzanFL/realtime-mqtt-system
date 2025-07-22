@@ -16,7 +16,7 @@ import { LocalStorageCache } from '../services/local-storage-cache';
       <section class="px-2 py-4">
         <h2 class="text-xl font-semibold">Machine ID: <span class="font-bold">{{factoryData().machine_id}}</span></h2>
       </section>
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <app-system-item-card title="Production Count">
           <div class="w-full flex justify-center items-center text-xl font-semibold py-5">
             <span>{{factoryData().production_count}} unit</span>
@@ -73,7 +73,7 @@ export class Factory implements OnInit, OnDestroy {
       this.websocketSub.unsubscribe();
     }
   }
-  
+
   private loadInitialDataFromCache(): void {
     const cachedData = this.cacheService.get<any>(this.cacheKey);
     if (cachedData) {

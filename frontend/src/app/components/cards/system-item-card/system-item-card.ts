@@ -5,7 +5,7 @@ import { Component, Input } from '@angular/core';
   standalone: true,
   imports: [],
   template: `
-    <section class="w-full h-full min-w-xs flex flex-col items-center bg-white rounded-2xl shadow-lg p-4">
+    <section class="w-full h-full flex flex-col items-center bg-white rounded-2xl shadow-lg p-4">
       <h3 class="text-2xl font-bold pt-2 mb-2">{{title}}</h3>
       <ng-content></ng-content>
     </section>

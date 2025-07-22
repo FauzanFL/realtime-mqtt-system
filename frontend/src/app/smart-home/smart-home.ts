@@ -20,7 +20,7 @@ import { environment } from '../../environments/environment.development';
       <section class="px-2 py-4">
         <h2 class="text-xl font-semibold">Device ID: <span class="font-bold">{{smartHomeData().device_id}}</span></h2>
       </section>
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <app-system-item-card title="Humidity">
           <app-humidity-chart [humidityValue]="smartHomeData().humidity_percent" />
         </app-system-item-card>

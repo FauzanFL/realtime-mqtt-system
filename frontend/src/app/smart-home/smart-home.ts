@@ -9,6 +9,8 @@ import { TemperatureChart } from "../components/charts/temperature-chart/tempera
 import { LightIntensity } from "../components/elements/light-intensity/light-intensity";
 import { MotionDetected } from "../components/elements/motion-detected/motion-detected";
 import { Loading } from '../services/loading';
+import { LocalStorageCache } from '../services/local-storage-cache';
+import { environment } from '../../environments/environment.development';
 
 @Component({
   selector: 'app-smart-home',
@@ -46,25 +48,40 @@ export class SmartHome implements OnInit, OnDestroy {
     timestamp: ""
   });
   private websocketSub!: Subscription;
+  private cacheKey: string = environment.cacheKey;
 
-  constructor(private websocketService: Websocket, private loadingService: Loading){};
+  constructor(private websocketService: Websocket, private loadingService: Loading, private cacheService: LocalStorageCache){};
 
   ngOnInit(): void {
     this.loadingService.show();
-    this.websocketSub = this.websocketService.messages$.subscribe({
-      next: (message) => {
-        const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
-        this.smartHomeData.set(messageFiltered['smart_home/living_room/sensor']);
-        
-        this.loadingService.hide();
-      },
-      error: (err) => console.error(err),
-    })
+    this.loadInitialDataFromCache();
+    this.subscribeToWebsocket();
   }
 
   ngOnDestroy(): void {
     if (this.websocketSub) {
       this.websocketSub.unsubscribe();
     }
+  }
+
+  private loadInitialDataFromCache(): void {
+    const cachedData = this.cacheService.get<any>(this.cacheKey);
+    if (cachedData) {
+      this.smartHomeData.set(cachedData['smart_home/living_room/sensor']);
+      this.loadingService.hide();
+    }
+  }
+
+  private subscribeToWebsocket(): void {
+    this.websocketSub = this.websocketService.messages$.subscribe({
+      next: (message) => {
+        const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
+        this.smartHomeData.set(messageFiltered['smart_home/living_room/sensor']);
+        this.cacheService.set(this.cacheKey, messageFiltered);
+        
+        this.loadingService.hide();
+      },
+      error: (err) => console.error(err),
+    })
   }
 }

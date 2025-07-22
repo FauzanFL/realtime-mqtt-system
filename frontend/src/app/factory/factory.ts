@@ -5,6 +5,8 @@ import { FactoryLineAMachineStatusData } from '../models/data.models';
 import { CommonModule } from '@angular/common';
 import { SystemItemCard } from "../components/cards/system-item-card/system-item-card";
 import { Loading } from '../services/loading';
+import { environment } from '../../environments/environment.development';
+import { LocalStorageCache } from '../services/local-storage-cache';
 
 @Component({
   selector: 'app-factory',
@@ -56,25 +58,40 @@ export class Factory implements OnInit, OnDestroy {
     timestamp: ""
   });
   private websocketSub: Subscription | undefined;
+  private cacheKey: string = environment.cacheKey;
 
-  constructor(private websockteService: Websocket, private loadingService: Loading){};
+  constructor(private websocketService: Websocket, private loadingService: Loading, private cacheService: LocalStorageCache){};
 
   ngOnInit(): void {
     this.loadingService.show();
-    this.websocketSub = this.websockteService.messages$.subscribe({
-      next: (message) => {
-        const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
-        this.factoryData.set(messageFiltered['factory/line_A/machine_status']);
-        
-        this.loadingService.hide();
-      },
-      error: (err) => console.error(err),
-    })
+    this.loadInitialDataFromCache();
+    this.subscribeToWebsocket();
   }
 
   ngOnDestroy(): void {
     if (this.websocketSub) {
       this.websocketSub.unsubscribe();
     }
+  }
+  
+  private loadInitialDataFromCache(): void {
+    const cachedData = this.cacheService.get<any>(this.cacheKey);
+    if (cachedData) {
+      this.factoryData.set(cachedData['factory/line_A/machine_status']);
+      this.loadingService.hide();
+    }
+  }
+
+  private subscribeToWebsocket(): void {
+    this.websocketSub = this.websocketService.messages$.subscribe({
+      next: (message) => {
+        const messageFiltered = typeof message !== 'object' ? JSON.parse(message) : message;
+        this.factoryData.set(messageFiltered['factory/line_A/machine_status']);
+        this.cacheService.set(this.cacheKey, messageFiltered);
+        
+        this.loadingService.hide();
+      },
+      error: (err) => console.error(err),
+    })
   }
 }

@@ -57,6 +57,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      SAVE_TO_DB: ${SAVE_TO_DB}
     depends_on:
       - mqtt-broker
       - postgre-db

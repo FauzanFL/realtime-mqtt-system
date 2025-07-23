@@ -1,16 +1,13 @@
 import paho.mqtt.client as mqtt
 import json
 import asyncio
-import os
 import time
 from dotenv import load_dotenv
 
-from websocket import websocket_manager
+import environment
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
-
-MQTT_BROKER = os.getenv("MQTT_BROKER_HOST")
-MQTT_PORT = int(os.getenv("MQTT_BROKER_PORT"))
+MQTT_BROKER = environment.MQTT_BROKER
+MQTT_PORT = environment.MQTT_PORT
 
 MQTT_TOPICS = [
     "smart_home/living_room/sensor",

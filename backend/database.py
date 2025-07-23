@@ -1,5 +1,3 @@
-from dotenv import load_dotenv
-import os
 import asyncio
 from datetime import datetime
 
@@ -7,13 +5,15 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from models import SmartHomeLivingRoomData, FleetTruckLocationData, FactoryMachineData, Base
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+import environment
 
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = environment.DB_HOST
+DB_PORT = environment.DB_PORT
+DB_NAME = environment.DB_NAME
+DB_USER = environment.DB_USER
+DB_PASSWORD = environment.DB_PASSWORD
+
+SAVE_TO_DB = environment.SAVE_TO_DB
 
 DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -24,7 +24,6 @@ AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_com
 class DatabaseManager:
     def __init__(self):
         self._is_ready = asyncio.Event()
-        self.storage_enabled = False
         self.storage_interval = 10
         self.mqtt_subscriber = None
 
@@ -56,9 +55,6 @@ class DatabaseManager:
         await self._is_ready.wait()
         async with AsyncSessionLocal() as session:
             yield session
-
-    def set_storage_enabled(self, enable: bool):
-        self.storage_enabled = enable
     
     def set_mqtt_subscriber(self, subscriber):
         self.mqtt_subscriber = subscriber
@@ -73,7 +69,7 @@ class DatabaseManager:
         await self._is_ready.wait()
         while True:
             try:
-                if self.storage_enabled and self.mqtt_subscriber:
+                if SAVE_TO_DB and self.mqtt_subscriber:
                     combined_data = await self.mqtt_subscriber.get_combined_data()
                     if combined_data:
                         async for session in self.get_db():

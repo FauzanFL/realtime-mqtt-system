@@ -8,13 +8,13 @@ import { CommonModule } from '@angular/common';
   imports: [RouterLink, RouterLinkActive, HamburgerMenu, CommonModule],
   template: `
     <header class="bg-gradient-to-r from-blue-500 to-indigo-700 text-white shadow-lg py-2 px-4 sm:px-6 md:px-8 flex flex-col md:flex-row items-center justify-between">
-      <section class="flex justify-center items-center gap-2">
+      <section class="flex justify-center items-center gap-4">
         <img src="/assets/img/logo.png" alt="" class="w-20 h-20 my-2 bg-slate-100 rounded-full">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">{{title()}}</h1>
       </section>
 
       <section class="flex flex-col gap-2 md:hidden justify-center items-center w-full">
-        <app-hamburger-menu (menuToggle)="onMenuToggled($event)" />
+        <app-hamburger-menu class="w-full" (menuToggle)="onMenuToggled($event)" />
         <nav 
           class="flex flex-col justify-around items-center duration-300 bg-white/10 w-full" 
           [ngClass]="{'max-h-0': !menuOpen, 'max-h-screen': menuOpen}"
